@@ -1,12 +1,108 @@
-import { motion } from 'framer-motion'
+import { useRef } from 'react'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import ScrollReveal from '../components/ScrollReveal'
 import styles from './Home.module.css'
+import profilePic from '../assets/pic.jpeg'
 
 const pageVariants = {
   initial: { opacity: 0 },
-  animate: { opacity: 1, transition: { duration: 0.4 } },
-  exit: { opacity: 0, transition: { duration: 0.25 } },
+  animate: { opacity: 1, transition: { duration: 1.1, ease: [0.22, 1, 0.36, 1] } },
+  exit: { opacity: 0, transition: { duration: 0.35, ease: 'easeIn' } },
+}
+
+const crossPositions = [
+  [110, 180], [640, 70], [980, 380], [280, 720],
+  [1090, 680], [750, 830], [450, 330], [1140, 480],
+]
+
+function BgSvgs() {
+  const { scrollYProgress } = useScroll()
+
+  const ringsY       = useTransform(scrollYProgress, [0, 1], [0, -160])
+  const ringsOpacity = useTransform(scrollYProgress, [0, 0.45, 1], [0.065, 0.04, 0.018])
+  const hexY         = useTransform(scrollYProgress, [0, 1], [0, -90])
+  const dotY         = useTransform(scrollYProgress, [0, 1], [0, -55])
+  const crossesY     = useTransform(scrollYProgress, [0, 1], [0, -35])
+
+  return (
+    <div className={styles.svgBg} aria-hidden="true">
+      {/* Concentric rings — top-right: spin + scroll parallax + opacity fade */}
+      <motion.svg
+        className={`${styles.svgEl} ${styles.svgRings}`}
+        viewBox="0 0 560 560"
+        fill="none"
+        style={{ y: ringsY, opacity: ringsOpacity }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 90, repeat: Infinity, ease: 'linear' }}
+      >
+        <circle cx="280" cy="280" r="258" stroke="rgba(200,255,0,1)"   strokeWidth="0.8" />
+        <circle cx="280" cy="280" r="194" stroke="rgba(255,255,255,1)" strokeWidth="0.8" />
+        <circle cx="280" cy="280" r="130" stroke="rgba(200,255,0,1)"   strokeWidth="0.8" />
+        <circle cx="280" cy="280" r="66"  stroke="rgba(255,255,255,1)" strokeWidth="0.8" />
+      </motion.svg>
+
+      {/* Nested hexagons — bottom-left: reverse spin + scroll parallax */}
+      <motion.svg
+        className={`${styles.svgEl} ${styles.svgHex}`}
+        viewBox="0 0 440 440"
+        fill="none"
+        style={{ y: hexY }}
+        animate={{ rotate: -360 }}
+        transition={{ duration: 120, repeat: Infinity, ease: 'linear' }}
+      >
+        <polygon points="220,22 391,121 391,319 220,418 49,319 49,121"
+          stroke="rgba(200,255,0,1)" strokeWidth="0.8" />
+        <polygon points="220,72 348,146 348,294 220,368 92,294 92,146"
+          stroke="rgba(255,255,255,1)" strokeWidth="0.8" />
+        <polygon points="220,122 305,171 305,269 220,318 135,269 135,171"
+          stroke="rgba(200,255,0,1)" strokeWidth="0.8" />
+      </motion.svg>
+
+      {/* Dot grid — full viewport: slow parallax drift + subtle breathe */}
+      <motion.svg
+        className={`${styles.svgEl} ${styles.svgDotGrid}`}
+        viewBox="0 0 1200 900"
+        preserveAspectRatio="xMidYMid slice"
+        style={{ y: dotY }}
+        animate={{ opacity: [0.035, 0.055, 0.035] }}
+        transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        <defs>
+          <pattern id="bgDotPattern" x="0" y="0" width="48" height="48" patternUnits="userSpaceOnUse">
+            <circle cx="24" cy="24" r="1" fill="white" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#bgDotPattern)" />
+      </motion.svg>
+
+      {/* Scattered cross marks — scroll parallax + staggered blink */}
+      <motion.svg
+        className={`${styles.svgEl} ${styles.svgCrosses}`}
+        viewBox="0 0 1200 900"
+        fill="none"
+        style={{ y: crossesY }}
+      >
+        {crossPositions.map(([cx, cy], i) => (
+          <motion.g
+            key={i}
+            stroke="rgba(200,255,0,1)"
+            strokeWidth="1"
+            animate={{ opacity: [0.35, 1, 0.35] }}
+            transition={{
+              delay: i * 0.3,
+              duration: 2.6 + (i % 4) * 0.5,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          >
+            <line x1={cx} y1={cy - 8} x2={cx} y2={cy + 8} />
+            <line x1={cx - 8} y1={cy} x2={cx + 8} y2={cy} />
+          </motion.g>
+        ))}
+      </motion.svg>
+    </div>
+  )
 }
 
 const allSkills = [
@@ -67,9 +163,49 @@ function RevealWord({ text, baseDelay }) {
 
 const marqueeItems = [...allSkills, ...allSkills]
 
+function PhotoCard({ src }) {
+  const innerRef = useRef(null)
+
+  const handleMouseMove = (e) => {
+    const el = innerRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width
+    const y = (e.clientY - rect.top) / rect.height
+    el.style.setProperty('--rx', `${((y - 0.5) * -16).toFixed(2)}deg`)
+    el.style.setProperty('--ry', `${((x - 0.5) * 16).toFixed(2)}deg`)
+    el.style.setProperty('--mx', `${(x * 100).toFixed(1)}%`)
+    el.style.setProperty('--my', `${(y * 100).toFixed(1)}%`)
+  }
+
+  const handleMouseLeave = () => {
+    const el = innerRef.current
+    if (!el) return
+    el.style.setProperty('--rx', '0deg')
+    el.style.setProperty('--ry', '0deg')
+  }
+
+  return (
+    <div className={styles.photoFloat}>
+      <div
+        ref={innerRef}
+        className={styles.photoCard}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
+        <img src={src} alt="Sricharan Donakonda" className={styles.profileImg} />
+        <div className={styles.photoSheen} />
+      </div>
+    </div>
+  )
+}
+
 export default function Home() {
   return (
-    <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+    <>
+    <BgSvgs />
+    <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit"
+      style={{ position: 'relative', zIndex: 1 }}>
 
       {/* ═══ HERO ═══ */}
       <section className={styles.hero}>
@@ -186,18 +322,21 @@ export default function Home() {
             </ScrollReveal>
 
             <ScrollReveal delay={0.2}>
-              <div className={styles.statsGroup}>
-                {[
-                  { n: '2+', l: 'Years Coding' },
-                  { n: '5+', l: 'Projects Shipped' },
-                  { n: '10+', l: 'Technologies' },
-                  { n: '∞', l: 'Curiosity' },
-                ].map(({ n, l }) => (
-                  <div key={l} className={styles.stat}>
-                    <span className={styles.statNum}>{n}</span>
-                    <span className={styles.statLabel}>{l}</span>
-                  </div>
-                ))}
+              <div className={styles.aboutRight}>
+                <PhotoCard src={profilePic} />
+                <div className={styles.statsGroup}>
+                  {[
+                    { n: '2+', l: 'Years Coding' },
+                    { n: '5+', l: 'Projects Shipped' },
+                    { n: '10+', l: 'Technologies' },
+                    { n: '∞', l: 'Curiosity' },
+                  ].map(({ n, l }) => (
+                    <div key={l} className={styles.stat}>
+                      <span className={styles.statNum}>{n}</span>
+                      <span className={styles.statLabel}>{l}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </ScrollReveal>
           </div>
@@ -317,5 +456,6 @@ export default function Home() {
       </footer>
 
     </motion.div>
+    </>
   )
 }

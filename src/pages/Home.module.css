@@ -1,3 +1,45 @@
+/* ─── SVG BACKGROUND ────────────────────────────────── */
+.svgBg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.svgEl {
+  position: absolute;
+}
+
+.svgRings {
+  top: -14%;
+  right: -10%;
+  width: min(58vw, 520px);
+  height: auto;
+  will-change: transform;
+}
+
+.svgHex {
+  bottom: -10%;
+  left: -6%;
+  width: min(44vw, 400px);
+  height: auto;
+  opacity: 0.05;
+  will-change: transform;
+}
+
+.svgDotGrid {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.svgCrosses {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
 /* ─── HERO ──────────────────────────────────────────── */
 .hero {
   position: relative;
@@ -240,8 +282,8 @@
 /* ─── ABOUT ────────────────────────────────────────────── */
 .aboutGrid {
   display: grid;
-  grid-template-columns: 1.65fr 1fr;
-  gap: 5rem;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 4rem;
   align-items: start;
 }
 
@@ -257,12 +299,81 @@
   line-height: 1.8;
 }
 
-.statsGroup {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2.5rem 1.5rem;
+.aboutRight {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
   position: sticky;
   top: calc(var(--nav-h) + 2rem);
+}
+
+@keyframes photoFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-9px); }
+}
+
+.photoFloat {
+  animation: photoFloat 5s ease-in-out infinite;
+}
+
+.photoFloat:hover {
+  animation-play-state: paused;
+}
+
+.photoCard {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.1s ease-out, box-shadow 0.35s;
+  will-change: transform;
+  cursor: crosshair;
+  box-shadow:
+    0 0 0 1px var(--border),
+    0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.photoCard:hover {
+  box-shadow:
+    0 0 0 1.5px rgba(200, 255, 0, 0.65),
+    0 24px 64px rgba(0, 0, 0, 0.55),
+    0 0 80px rgba(200, 255, 0, 0.12);
+  transition: transform 0.07s ease-out, box-shadow 0.35s;
+}
+
+.photoSheen {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 50%),
+    rgba(200, 255, 0, 0.22) 0%,
+    rgba(100, 180, 255, 0.08) 38%,
+    transparent 68%
+  );
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.photoCard:hover .photoSheen {
+  opacity: 1;
+}
+
+.profileImg {
+  width: 100%;
+  max-height: 320px;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  filter: grayscale(15%);
+}
+
+.statsGroup {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
 }
 
 .stat {}
@@ -530,8 +641,15 @@
     gap: 3rem;
   }
 
-  .statsGroup {
+  .aboutRight {
     position: static;
+  }
+
+  .profileImg {
+    max-height: 280px;
+  }
+
+  .statsGroup {
     grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
   }
