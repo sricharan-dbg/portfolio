@@ -17,6 +17,7 @@ const projects = [
       'A collaborative task management system designed for office environments to improve team productivity and visibility. Allows users to create, schedule, and assign tasks via a calendar-based interface. Managers get dynamic progress reports and real-time tracking across team members.',
     tech: ['React.js', 'Node.js', 'Express.js', 'REST APIs', 'CSS'],
     github: 'https://github.com/sricharan-dbg/chore-app',
+    live: 'https://chore-app-alpha.vercel.app',
     features: [
       'Calendar-based scheduling',
       'Team assignment & tracking',
@@ -36,6 +37,21 @@ const projects = [
       'Priority queue system',
       'Automatic retry mechanism',
       'Auto-refreshing live dashboard',
+    ],
+  },
+  {
+    num: '03',
+    title: 'Live Auction Platform',
+    description:
+      'A full-stack real-time web application where users can list items for auction, place bids, and watch live updates without refreshing the page. I handled the entire frontend — React component architecture, responsive layouts with TailwindCSS, auction listing and live bidding interfaces, frontend authentication integration, and UI animations.',
+    tech: ['React.js', 'TailwindCSS', 'Node.js', 'Express', 'MongoDB', 'Socket.io', 'JWT'],
+    github: 'https://github.com/sricharan-dbg/Live-Auction-Platform',
+    live: 'https://github.com/sricharan-dbg/Live-Auction-Platform',
+    features: [
+      'Real-time bidding via Socket.io',
+      'Auction listing & item management',
+      'JWT-based authentication flow',
+      'Responsive UI with animations',
     ],
   },
 ]
@@ -88,14 +104,26 @@ export default function Projects() {
               <div className={styles.projectBlock}>
                 <div className={styles.projectBlockTop}>
                   <span className={styles.projectNum}>{p.num}</span>
-                  <a
-                    href={p.github}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={styles.githubBtn}
-                  >
-                    View on GitHub ↗
-                  </a>
+                  <div className={styles.projectBtnGroup}>
+                    {p.live && (
+                      <a
+                        href={p.live}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={styles.liveBtn}
+                      >
+                        Live Demo ↗
+                      </a>
+                    )}
+                    <a
+                      href={p.github}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={styles.githubBtn}
+                    >
+                      View on GitHub ↗
+                    </a>
+                  </div>
                 </div>
 
                 <h2 className={styles.projectTitle}>{p.title}</h2>

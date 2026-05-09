@@ -61,6 +61,12 @@
   letter-spacing: 0.1em;
 }
 
+.projectBtnGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
 .githubBtn {
   font-size: 0.78rem;
   font-weight: 500;
@@ -76,6 +82,24 @@
   color: var(--lime);
   border-color: rgba(200, 255, 0, 0.35);
   background: var(--lime-dim);
+}
+
+.liveBtn {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--lime);
+  border: 1px solid rgba(200, 255, 0, 0.35);
+  padding: 0.38rem 0.9rem;
+  border-radius: 2px;
+  letter-spacing: 0.02em;
+  background: var(--lime-dim);
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.liveBtn:hover {
+  color: #000;
+  background: var(--lime);
+  border-color: var(--lime);
 }
 
 .projectTitle {
